@@ -1,5 +1,7 @@
 Haptic Handlebar
 
+![Haptic Handlebar working](https://user-images.githubusercontent.com/47333175/150306453-425dc789-4dcb-47bc-8392-a6d6010712dc.gif)
+
 Bill of materials:
 - Programmable Air (or air pump and pressure sensor): https://www.programmableair.com/
 - Arduino Uno
