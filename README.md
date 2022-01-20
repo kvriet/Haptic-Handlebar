@@ -17,4 +17,4 @@ Bill of materials:
 Printing guide:
 - tubing connectors should be printed at 0.1mm layer height, high quality
 - other prints can be printed at 0.2mm layer height
-
+- servo valves are inspired by mikey77's valves: https://www.instructables.com/3D-Print-Make-Servo-Controlled-Valves/
