@@ -4,27 +4,30 @@
 #include <Wire.h>
 
 // VARIABLES TO BE CHANGED //
-int rows = 3; // Number of balloons
-int cols = 12; // Number of values per balloon, 12 cols equals 3 seconds
-int timeIntervalInMilliseconds = 250;
+int cols = 3; // Number of balloons
+int rows = 12; // Number of values per balloon
+int initialIntervalTime = 250;
+int intervalDecrease = 50;
+int timeIntervalInMilliseconds = initialIntervalTime;
 int loopRepeat = 3;
 
-int values[7][3][12] = {
+int values[8][3][12] = {
   {{0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1,}, {0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0,}, {1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0,}}
   ,
   {{1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0,}, {0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0,}, {0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1,}}
   ,
-  {{1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,}, {1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,}, {1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,}}
+  {{1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0,}, {1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0,}, {1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0,}}
   ,
-  {{1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,}, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,}, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,}}
+  {{1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0,}, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,}, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,}}
   ,
-  {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,}, {1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,}, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,}}
+  {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,}, {1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0,}, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,}}
   ,
-  {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,}, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,}, {1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,}}
+  {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,}, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,}, {1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0,}}
   ,
-  {{1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,}, {1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0,}, {1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0,}}
+  {{1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0,}, {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,}, {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,}}
+  ,
+  {{1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0,}, {0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1,}, {1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0,}}
 };
-
 
 // VARIABLES TO LEAVE ALONE //
 long currentTime;
@@ -34,7 +37,6 @@ int angleOpen = 0;
 int angleClosed = 90;
 int loopIncrementer = 0;
 int wireValue;
-int patternNumber;
 boolean isStopped = true;
 boolean isLoopFinished = false;
 
@@ -55,11 +57,10 @@ void loop() {
       currentTime = millis();
       if (currentTime - prevTime > timeIntervalInMilliseconds) {
         // Per time interval, loop through valves
-        for (int i = 0; i < rows; i++) {
-          // Loop through the 3 rows (1 for each balloon)
-          if (values[patternNumber][i][index] == 0) {
+        for (int i = 0; i < cols; i++) {
+          if (values[wireValue - 1][i][index] == 0) {
             servos[i].write(angleClosed);
-          } else if (values[patternNumber][i][index] == 1) {
+          } else if (values[wireValue - 1][i][index] == 1) {
             servos[i].write(angleOpen);
           }
           delay(5); // For stability
@@ -70,14 +71,13 @@ void loop() {
           // If program is at end of row, loop back to front
           index = 0;
           loopIncrementer++;
-          timeIntervalInMilliseconds -= 25; // Every time the loop repeats, it is 25ms quicker per interval
+          timeIntervalInMilliseconds -= intervalDecrease; // Every time the loop repeats, it is 25ms quicker per interval
         }
       }
 
       if (loopIncrementer >= loopRepeat) {
-        // If loop has been repeated enough times, variables are reset
         loopIncrementer = 0;
-        timeIntervalInMilliseconds = 250;
+        timeIntervalInMilliseconds = initialIntervalTime;
         isLoopFinished = true;
         closeAllServos();
       }
@@ -93,7 +93,7 @@ void closeAllServos() {
 }
 
 void receiveEvent(int bytes) {
-  wireValue = Wire.read(); // Read one character from the I2C
+  wireValue = Wire.read();    // read one character from the I2C
   isLoopFinished = false;
   if (wireValue == 0) {
     isStopped = true;
@@ -102,8 +102,5 @@ void receiveEvent(int bytes) {
   }
   else {
     isStopped = false;
-    patternNumber = wireValue - 1;
-    // wireValue - 1 because 0 is used to stop the program
-    // so wireValue == 1 corresponds to the pattern at index 0
   }
 }
